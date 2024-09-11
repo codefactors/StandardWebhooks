@@ -8,16 +8,15 @@ Write-Output "PowerShell $($PSVersionTable.PSEdition) version $($PSVersionTable.
 
 Set-StrictMode -Version 2.0; $ErrorActionPreference = "Stop"; $ConfirmPreference = "None"; trap { Write-Error $_ -ErrorAction Continue; exit 1 }
 $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
-$SolutionRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
-Write-Output $SolutionRoot
+
 ###########################################################################
 # CONFIGURATION
 ###########################################################################
 
-$BuildProjectFile = "$SolutionRoot\build\_build.csproj"
-$TempDirectory = "$SolutionRoot\\.nuke\temp"
+$BuildProjectFile = "$PSScriptRoot\build\_build.csproj"
+$TempDirectory = "$PSScriptRoot\\.nuke\temp"
 
-$DotNetGlobalFile = "$SolutionRoot\\global.json"
+$DotNetGlobalFile = "$PSScriptRoot\\global.json"
 $DotNetInstallUrl = "https://dot.net/v1/dotnet-install.ps1"
 $DotNetChannel = "STS"
 
