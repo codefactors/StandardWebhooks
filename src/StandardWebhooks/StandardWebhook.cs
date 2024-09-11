@@ -8,9 +8,7 @@
 // see https://github.com/standard-webhooks/standard-webhooks/blob/main/libraries/LICENSE.
 
 using StandardWebhooks.Diagnostics;
-using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
-using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Text.Json;
 
@@ -35,39 +33,39 @@ public sealed class StandardWebhook
     /// <summary>
     /// Initializes a new instance of the <see cref="StandardWebhook"/> class.
     /// </summary>
-    /// <param name="key">Signing key, as string.</param>
-    public StandardWebhook(string key)
-        : this(key, WebhookConfigurationOptions.StandardWebhooks)
+    /// <param name="signingKey">Signing key, as string.</param>
+    public StandardWebhook(string signingKey)
+        : this(signingKey, WebhookConfigurationOptions.StandardWebhooks)
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StandardWebhook"/> class.
     /// </summary>
-    /// <param name="key">Signing key, as byte array.</param>
-    public StandardWebhook(byte[] key)
-        : this(key, WebhookConfigurationOptions.StandardWebhooks)
+    /// <param name="signingKey">Signing key, as byte array.</param>
+    public StandardWebhook(byte[] signingKey)
+        : this(signingKey, WebhookConfigurationOptions.StandardWebhooks)
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StandardWebhook"/> class.
     /// </summary>
-    /// <param name="key">Signing key, as byte array.</param>
+    /// <param name="signingKey">Signing key, as byte array.</param>
     /// <param name="options">Options to set custom header keys.</param>
-    public StandardWebhook(string key, WebhookConfigurationOptions options)
-        : this(Convert.FromBase64String(key.StartsWith(PREFIX) ? key[PREFIX.Length..] : key), options)
+    public StandardWebhook(string signingKey, WebhookConfigurationOptions options)
+        : this(Convert.FromBase64String(signingKey.StartsWith(PREFIX) ? signingKey[PREFIX.Length..] : signingKey), options)
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StandardWebhook"/> class.
     /// </summary>
-    /// <param name="key">Signing key, as byte array.</param>
+    /// <param name="signingKey">Signing key, as byte array.</param>
     /// <param name="options">Options to set custom header keys.</param>
-    public StandardWebhook(byte[] key, WebhookConfigurationOptions options)
+    public StandardWebhook(byte[] signingKey, WebhookConfigurationOptions options)
     {
-        _key = key;
+        _key = signingKey;
 
         _idHeaderKey = options.IdHeaderKey;
         _signatureHeaderKey = options.SignatureHeaderKey;
