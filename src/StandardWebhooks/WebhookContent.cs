@@ -38,7 +38,7 @@ public class WebhookContent<T> : ByteArrayContent
     /// <returns>New instance of a <see cref="WebhookContent{T}"/>.</returns>
     public static WebhookContent<T> Create(T content, JsonSerializerOptions? jsonOptions = null)
     {
-        var utf8bytes = JsonSerializer.SerializeToUtf8Bytes(content, jsonOptions);
+        var utf8bytes = JsonSerializer.SerializeToUtf8Bytes(content, jsonOptions ?? DefaultJsonSerializerOptions);
 
         return new WebhookContent<T>(utf8bytes);
     }

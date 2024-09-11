@@ -91,8 +91,19 @@ class Build : NukeBuild
                 .EnableNoRestore());
         });
 
-    Target Pack => _ => _
+    Target Test => _ => _
         .DependsOn(Compile)
+        .Executes(() =>
+        {
+            DotNetTest(s => s
+                .SetProjectFile(Solution)
+                .SetConfiguration(Configuration)
+                .EnableNoRestore()
+                .EnableNoBuild());
+        });
+
+    Target Pack => _ => _
+        .DependsOn(Test)
         .OnlyWhenDynamic(() => GitRepository.Tags.Count > 0 || IsLocalBuild)
         .Executes(() =>
         {
@@ -114,7 +125,7 @@ class Build : NukeBuild
         {
             var packageFiles = ArtifactsDirectory
                 .GlobFiles("*.nupkg")
-                .Where(x => !x.ToString().EndsWith("symbols.nupkg") && !x.ToString().Contains("Codefactors.Testing"))
+                .Where(x => !x.ToString().EndsWith("symbols.nupkg"))
                 .ToList();
 
             packageFiles.ForEach(p =>

@@ -13,11 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="C:\Users\Payetools\source\repos\codefactors\codefactors\README.md" />
-    <None Remove="C:\Users\Payetools\source\repos\codefactors\StandardWebhooks\shared/LICENSE.md" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
   </ItemGroup>
 

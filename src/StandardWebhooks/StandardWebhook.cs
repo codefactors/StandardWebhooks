@@ -12,6 +12,7 @@ using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Text;
+using System.Text.Json;
 
 namespace StandardWebhooks;
 
@@ -118,6 +119,14 @@ public sealed class StandardWebhook
         throw new WebhookVerificationException("No matching signature found");
     }
 
+    /// <summary>
+    /// Generates the appropriate signature for the supplied webhook payload.
+    /// </summary>
+    /// <param name="msgId">Message Id.</param>
+    /// <param name="timestamp">Sending timestamp.</param>
+    /// <param name="payload">Webhook payload, as a string.</param>
+    /// <returns>Standard Webhooks signature in the format 'version,signature'.</returns>
+    /// <remarks>Currently only supports 'v1' signatures.</remarks>
     public string Sign(string msgId, DateTimeOffset timestamp, string payload)
     {
         var toSign = $"{msgId}.{timestamp.ToUnixTimeSeconds()}.{payload}";
@@ -133,9 +142,21 @@ public sealed class StandardWebhook
         }
     }
 
-    public HttpContent MakeContent<T>(T body, string msgId, DateTimeOffset timestamp)
+    /// <summary>
+    /// Generates an <see cref="HttpContent"/> that contains the supplied payload, with the appropriate
+    /// Standard Webhooks headers added, including the signature for the payload.
+    /// </summary>
+    /// <typeparam name="T">Type of payload.</typeparam>
+    /// <param name="body">Content for the webhook payload.</param>
+    /// <param name="msgId">Message identifier.</param>
+    /// <param name="timestamp">Sending timestamp.</param>
+    /// <param name="jsonOptions">Optional <see cref="JsonSerializerOptions"/> instance to control how
+    /// the payload is serialized.</param>
+    /// <returns>An <see cref="HttpContent"/> initialised with the JSON serialized payload and necessary
+    /// headers set.</returns>
+    public HttpContent MakeHttpContent<T>(T body, string msgId, DateTimeOffset timestamp, JsonSerializerOptions? jsonOptions = null)
     {
-        var content = WebhookContent<T>.Create(body);
+        var content = WebhookContent<T>.Create(body, jsonOptions);
 
         var signature = Sign(msgId, timestamp, content.ToString());
 

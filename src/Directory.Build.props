@@ -5,10 +5,10 @@
 		<Authors>Codefactors Ltd</Authors>
 		<Copyright>Copyright (c) 2024, Codefactors Ltd</Copyright>
 		<Company>Codefactors Ltd</Company>
-		<PackageProjectUrl>https://github.com/codefactors/codefactors</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/codefactors/StandardWebhooks</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-		<RepositoryUrl>https://github.com/codefactors/codefactors</RepositoryUrl>
+		<RepositoryUrl>https://github.com/codefactors/StandardWebhooks</RepositoryUrl>
 	</PropertyGroup>
 	
 	<ItemGroup>
@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="$(SolutionDir)shared/LICENSE.md" Pack="true" PackagePath="" />
+		<None Include="$(SolutionDir)LICENSE.md" Pack="true" PackagePath="" />
 		<None Include="$(SolutionDir)README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 
