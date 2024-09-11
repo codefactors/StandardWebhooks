@@ -8,7 +8,9 @@
 // see https://github.com/standard-webhooks/standard-webhooks/blob/main/libraries/LICENSE.
 
 using StandardWebhooks.Diagnostics;
+using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
+using System.Security.Cryptography.Xml;
 using System.Text;
 
 namespace StandardWebhooks;
@@ -71,6 +73,15 @@ public sealed class StandardWebhook
         _timestampHeaderKey = options.TimestampHeaderKey;
     }
 
+    /// <summary>
+    /// Verifies the signature of a webhook payload.
+    /// </summary>
+    /// <param name="payload">Webhook payload in string form.</param>
+    /// <param name="headers">HTTP header collection.</param>
+    /// <exception cref="WebhookVerificationException">Thrown if any of the message id,
+    /// message signature or message timestamp headers are missing or empty.  Also thrown if the signature header
+    /// field value is not in the correct format.
+    /// </exception>
     public void Verify(string payload, IHeaderDictionary headers)
     {
         string msgId = headers[_idHeaderKey].ToString();
@@ -78,13 +89,13 @@ public sealed class StandardWebhook
         string msgTimestamp = headers[_timestampHeaderKey].ToString();
 
         if (string.IsNullOrEmpty(msgId) || string.IsNullOrEmpty(msgSignature) || string.IsNullOrEmpty(msgTimestamp))
-            throw new WebhookVerificationException("Missing Required Headers");
+            throw new WebhookVerificationException($"Missing required headers; {_idHeaderKey}, {_signatureHeaderKey} and {_timestampHeaderKey} must be supplied");
 
-        var timestamp = StandardWebhook.VerifyTimestamp(msgTimestamp);
+        var timestamp = VerifyTimestamp(msgTimestamp);
 
-        var signature = this.Sign(msgId, timestamp, payload);
+        var expectedSignature = Sign(msgId, timestamp, payload)
+            .Split(',')[1];
 
-        var expectedSignature = signature.Split(',')[1];
         var passedSignatures = msgSignature.Split(' ');
 
         foreach (string versionedSignature in passedSignatures)
@@ -92,7 +103,7 @@ public sealed class StandardWebhook
             var parts = versionedSignature.Split(',');
 
             if (parts.Length < 2)
-                throw new WebhookVerificationException("Invalid Signature Headers");
+                throw new WebhookVerificationException("Invalid signature header; must be in the form 'version,signature'");
 
             var version = parts[0];
             var passedSignature = parts[1];
@@ -124,11 +135,13 @@ public sealed class StandardWebhook
 
     public HttpContent MakeContent<T>(T body, string msgId, DateTimeOffset timestamp)
     {
-        var content = StringContent.Create(body);
+        var content = WebhookContent<T>.Create(body);
 
-        var signature = Sign(msgId, timestamp, )
+        var signature = Sign(msgId, timestamp, content.ToString());
 
-        content.Headers.Add()
+        content.Headers.Add(_idHeaderKey, msgId);
+        content.Headers.Add(_timestampHeaderKey, timestamp.ToUnixTimeSeconds().ToString());
+        content.Headers.Add(_signatureHeaderKey, signature);
 
         return content;
     }
@@ -147,7 +160,7 @@ public sealed class StandardWebhook
         }
         catch
         {
-            throw new WebhookVerificationException("Invalid Signature Headers");
+            throw new WebhookVerificationException("Invalid timestamp header value; must be the number of seconds elapsed since 1970-01-01T00:00:00Z");
         }
 
         if (timestamp < now.AddSeconds(-1 * TOLERANCE_IN_SECONDS))

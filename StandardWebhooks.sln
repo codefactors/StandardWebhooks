@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.cspr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StandardWebhooks", "src\StandardWebhooks\StandardWebhooks.csproj", "{1E91D315-9749-4CE3-B72D-D2EFB8666B8F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D2DE5936-36E2-4DD7-A211-17B808C92CD7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandardWebhooks.Tests", "test\StandardWebhooks.Tests\StandardWebhooks.Tests.csproj", "{D2DF6F72-749E-4185-B960-7E6D53BB35D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,12 +25,17 @@ Global
 		{1E91D315-9749-4CE3-B72D-D2EFB8666B8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E91D315-9749-4CE3-B72D-D2EFB8666B8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E91D315-9749-4CE3-B72D-D2EFB8666B8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2DF6F72-749E-4185-B960-7E6D53BB35D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2DF6F72-749E-4185-B960-7E6D53BB35D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2DF6F72-749E-4185-B960-7E6D53BB35D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2DF6F72-749E-4185-B960-7E6D53BB35D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1E91D315-9749-4CE3-B72D-D2EFB8666B8F} = {739D5DDB-21A7-41FE-BC02-374916C80DAE}
+		{D2DF6F72-749E-4185-B960-7E6D53BB35D4} = {D2DE5936-36E2-4DD7-A211-17B808C92CD7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4096FE9-E7DD-4E5D-BC35-11D5E0219E55}

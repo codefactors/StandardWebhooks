@@ -4,90 +4,48 @@
 //
 //   * The MIT License, see https://opensource.org/license/mit/
 
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Diagnostics;
-using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 
 namespace StandardWebhooks;
 
 /// <summary>
 /// Provides HTTP content for Standard Webhooks.
 /// </summary>
+/// <typeparam name="T">The type of the content.</typeparam>
 public class WebhookContent<T> : ByteArrayContent
 {
-    private const string DefaultMediaType = "application/json";
+    private static readonly Encoding Utf8Encoding = new UTF8Encoding(false, true);
+    private static readonly JsonSerializerOptions DefaultJsonSerializerOptions =
+         new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = false };
 
-    private static readonly Encoding DefaultEncoding = Encoding.UTF8;
+    // Maintain copy of the content so we can return it as a string.
+    private readonly byte[] _content;
 
-    /// <summary>Creates a new instance of the <see cref="WebhookContent"/> class.</summary>
-    /// <param name="content">The content used to initialize the <see cref="WebhookContent"/>.</param>
-    /// <remarks>The media type for the <see cref="WebhookContent"/> created defaults to text/plain.</remarks>
-    public WebhookContent(T content)
-        : this(content, DefaultEncoding, DefaultMediaType)
+    private WebhookContent(byte[] content)
+        : base(content)
     {
+        _content = content;
+
+        Headers.ContentType = new MediaTypeHeaderValue("application/json") { CharSet = Utf8Encoding.WebName };
     }
 
-    /// <summary>Creates a new instance of the <see cref="WebhookContent"/> class.</summary>
-    /// <param name="content">The content used to initialize the <see cref="WebhookContent"/>.</param>
-    /// <param name="mediaType">The media type to use for the content.</param>
-    public WebhookContent(T content, MediaTypeHeaderValue mediaType)
-        : this(content, DefaultEncoding, mediaType)
+    /// <summary>Creates a new instance of the <see cref="WebhookContent{T}"/> class.</summary>
+    /// <param name="content">The content to be used to initialize the <see cref="WebhookContent{T}"/>.</param>
+    /// <param name="jsonOptions">The JSON serialization options to be used to serialize the content. Optional,
+    /// defaults to <see cref="JsonSerializerDefaults.Web"/>  with WriteIndented set to false.</param>
+    /// <returns>New instance of a <see cref="WebhookContent{T}"/>.</returns>
+    public static WebhookContent<T> Create(T content, JsonSerializerOptions? jsonOptions = null)
     {
+        var utf8bytes = JsonSerializer.SerializeToUtf8Bytes(content, jsonOptions);
+
+        return new WebhookContent<T>(utf8bytes);
     }
 
-    /// <summary>Creates a new instance of the <see cref="WebhookContent"/> class.</summary>
-    /// <param name="content">The content used to initialize the <see cref="WebhookContent"/>.</param>
-    /// <param name="encoding">The encoding to use for the content.</param>
-    /// <remarks>The media type for the <see cref="WebhookContent"/> created defaults to text/plain.</remarks>
-    public WebhookContent(T content, Encoding? encoding)
-        : this(content, encoding, DefaultMediaType)
-    {
-    }
-
-    /// <summary>Creates a new instance of the <see cref="WebhookContent"/> class.</summary>
-    /// <param name="content">The content used to initialize the <see cref="WebhookContent"/>.</param>
-    /// <param name="encoding">The encoding to use for the content.</param>
-    /// <param name="mediaType">The media type to use for the content.</param>
-    public WebhookContent(T content, Encoding? encoding, string mediaType)
-        : this(content, encoding, new MediaTypeHeaderValue(mediaType ?? DefaultMediaType, (encoding ?? DefaultEncoding).WebName))
-    {
-    }
-
-    /// <summary>Creates a new instance of the <see cref="WebhookContent"/> class.</summary>
-    /// <param name="content">The content used to initialize the <see cref="WebhookContent"/>.</param>
-    /// <param name="encoding">The encoding to use for the content.</param>
-    /// <param name="mediaType">The media type to use for the content.</param>
-    public WebhookContent(string content, Encoding? encoding, MediaTypeHeaderValue mediaType)
-        : base(GetContentByteArray(content, encoding))
-    {
-        Headers.ContentType = mediaType;
-    }
-
-    /// <summary>Serialize and write the byte array provided in the constructor to an HTTP content stream as an asynchronous operation.</summary>
-    /// <param name="stream">The target stream.</param>
-    /// <param name="context">Information about the transport, like channel binding token. This parameter may be <see langword="null" />.</param>
-    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
-    /// <returns>The task object representing the asynchronous operation.</returns>
-    protected override Task SerializeToStreamAsync(Stream stream, TransportContext? context, CancellationToken cancellationToken) =>
-        // Only skip the original protected virtual SerializeToStreamAsync if this
-        // isn't a derived type that may have overridden the behavior.
-        GetType() == typeof(WebhookContent) ? SerializeToStreamAsyncCore(stream, cancellationToken) :
-        base.SerializeToStreamAsync(stream, context, cancellationToken);
-
-    protected override bool TryComputeLength(out long length)
-    {
-        throw new NotImplementedException();
-    }
-
-    private static byte[] GetContentByteArray(string content, Encoding? encoding)
-    {
-        ArgumentNullException.ThrowIfNull(content);
-
-        // In this case we treat 'null' strings differently from string.Empty in order to be consistent with our
-        // other *Content constructors: 'null' throws, empty values are allowed.
-
-        return (encoding ?? DefaultEncoding).GetBytes(content);
-    }
+    /// <summary>
+    /// Gets the content as a string.
+    /// </summary>
+    /// <returns>String representation of the content.</returns>
+    public override string ToString() => Utf8Encoding.GetString(_content);
 }
