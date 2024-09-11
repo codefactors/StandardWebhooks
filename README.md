@@ -3,9 +3,8 @@
 ## Implementation of Standard Webhooks for .NET Core
 
 
-## Subhead
+### Generating HttpContent for a Webhook
 ```csharp
-
 	var testEntity = new TestEntity
 	{
 		Id = 1,
@@ -21,8 +20,10 @@
 
 ```
 
-### Acknowledgements
+## Acknowledgements
 
+This project leverages the work of the Standard Webhooks project, published on Github in the [standard-webhooks](https://github.com/standard-webhooks/standard-webhooks) repository.
+Specifically it builds upon the [C# reference implementation](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries/csharp).
 
-### License
+## License
 This project is licensed under the MIT License.
