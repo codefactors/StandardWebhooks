@@ -20,10 +20,11 @@ public class StandardWebhookFactory : IStandardWebhookFactory
     /// Initializes a new instance of the <see cref="StandardWebhookFactory"/> class.
     /// </summary>
     /// <param name="signingKey">Signing key, as byte array.</param>
-    /// <param name="webhookConfigurationOptions">Options to set custom header keys.</param>
+    /// <param name="webhookConfigurationOptions">Options to set custom header keys. Optional,
+    /// defaults to Standard Webhooks headers.</param>
     public StandardWebhookFactory(
         string signingKey,
-        WebhookConfigurationOptions? webhookConfigurationOptions)
+        WebhookConfigurationOptions? webhookConfigurationOptions = null)
     {
         _signingKey = signingKey;
         _webhookConfigurationOptions = webhookConfigurationOptions;
