@@ -2,6 +2,13 @@
 
 ## Implementation of Standard Webhooks for .NET Core
 
+StandardWebhooks is an implementation of the [Standard Webhooks specification](https://github.com/standard-webhooks/standard-webhooks/blob/main/spec/standard-webhooks.md)
+initiated by Svix and supported by other industry participants including Zapier, Twilio, ngrok and Kong.
+
+This repo extends the [C# reference implementation](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries/csharp),
+providing a maintained (nuget package) along with some helpful features for ASP.NET Core developers.
+
+It is supported on all current .NET Core platforms (.NET 6.0, .NET 8.0).
 
 ### Generating HttpContent for a Webhook
 ```csharp
@@ -48,6 +55,14 @@ var webhook = webhookFactory.CreateWebhook();
 Two standard `WebhookConfigurationOptions` configurations are provided as static instances, `WebhookConfigurationOptions.StandardWebhooks` and
 `WebhookConfigurationOptions.Svix`, the former for the HTTP headers as described in the Standard Webhooks specification and
 the latter for the headers used by Svix. The default configuration if no options are supplied is `WebhookConfigurationOptions.StandardWebhooks`.
+
+## Questions and Answers
+Please raise any issues or questions via the [Issues page on GitHub](https://github.com/codefactors/StandardWebhooks/issues).
+
+## Roadmap
+Currently the library doesn't provide any support for sending messages, beyond the ability to create an `HttpContent` instance
+from the message payload. The plan is to extent the library to support message transmission using `HttpClient`/`IHttpClientFactory`,
+leveraging the retry capabilites of the [Polly](https://github.com/App-vNext/Polly) package.
 
 ## Acknowledgements
 
