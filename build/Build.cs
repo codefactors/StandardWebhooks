@@ -18,6 +18,20 @@ using System.Linq;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Slack.SlackTasks;
 
+/*
+ NB Until Nuke supports .net 9.0, the following must be added to the build yml file, immediately
+ after the checkout step:
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+            8.0.x
+            9.0.100-rc.2.24474.11
+
+ */
+
 [GitHubActions(
     "continuous",
     GitHubActionsImage.UbuntuLatest,
