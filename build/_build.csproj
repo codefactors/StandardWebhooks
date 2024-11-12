@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -12,9 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nuke.Common" Version="8.1.2" />
-    <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
-  </ItemGroup>
+    <PackageReference Include="Nuke.Common" Version="8.1.4" />
+    <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />	  
+    </ItemGroup>
 
   <ItemGroup>
     <PackageDownload Include="minver-cli" Version="[5.0.0]" />
