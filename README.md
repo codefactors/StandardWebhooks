@@ -8,7 +8,13 @@ initiated by Svix and supported by other industry participants including Zapier,
 This repo extends the [C# reference implementation](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries/csharp),
 providing a maintained (nuget package) along with some helpful features for ASP.NET Core developers.
 
-It is supported on all current .NET Core platforms (.NET 6.0, .NET 8.0).
+It is supported on all current .NET Core platforms (.NET 8.0, NET 9.0).
+
+## Releases
+
+See the [release notes](doc/releases.md) for details of changes in each release.
+
+## Functionality
 
 ### Generating HttpContent for a Webhook
 ```csharp
