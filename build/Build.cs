@@ -112,8 +112,7 @@ class Build : NukeBuild
             DotNetTest(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                .EnableNoRestore()
-                .EnableNoBuild());
+                .EnableNoRestore());
         });
 
     Target Pack => _ => _
