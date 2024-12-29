@@ -1,8 +1,8 @@
 # Releases
 
-# 1.0.29
+# 1.0.33
 
-Full changelog: [1.0.28 -> 1.0.31](https://github.com/codefactors/StandardWebhooks/compare/1.0.28...1.0.31)
+Full changelog: [1.0.28 -> 1.0.33](https://github.com/codefactors/StandardWebhooks/compare/1.0.28...1.0.33)
 
 ## What's Changed
 
@@ -11,3 +11,4 @@ Full changelog: [1.0.28 -> 1.0.31](https://github.com/codefactors/StandardWebhoo
 - Build: Updated build project to .NET 9
 - Misc: Removed support for .NET 6.0 (out of support)
 - Test: Updated test project to .NET 9 and Microsoft Testing Platform
+- Test: Added .NET 8.0 for test project
