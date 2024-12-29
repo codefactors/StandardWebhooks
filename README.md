@@ -12,7 +12,11 @@ It is supported on all current .NET Core platforms (.NET 8.0, NET 9.0).
 
 ## Releases
 
-See the [release notes](doc/releases.md) for details of changes in each release.
+See the [release notes](doc/releases.md) for details of changes in each release.  The latest release should be available on Nuget at https://www.nuget.org/packages/StandardWebhooks.  To install using Package Manager:
+
+```
+dotnet add package StandardWebhooks --version 1.0.33
+```
 
 ## Functionality
 
