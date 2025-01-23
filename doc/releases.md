@@ -1,5 +1,14 @@
 # Releases
 
+# 1.0.35
+
+Full changelog: [1.0.33 -> 1.0.35](https://github.com/codefactors/StandardWebhooks/compare/1.0.33...1.0.35)
+
+## What's Changed
+
+### Update
+- Chore: Updated dependencies (Nuke.Common, coverlet.collector, xunit, xunit.runner.visualstudio)
+
 # 1.0.33
 
 Full changelog: [1.0.28 -> 1.0.33](https://github.com/codefactors/StandardWebhooks/compare/1.0.28...1.0.33)
