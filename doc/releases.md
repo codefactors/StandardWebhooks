@@ -1,5 +1,14 @@
 # Releases
 
+# 1.0.36
+
+Full changelog: [1.0.35 -> 1.0.36](https://github.com/codefactors/StandardWebhooks/compare/1.0.35...1.0.36)
+
+## What's Changed
+
+### Update
+- Chore: Updated dependencies (xunit.runner.visualstudio, Microsoft.NET.Test.Sdk)
+
 # 1.0.35
 
 Full changelog: [1.0.33 -> 1.0.35](https://github.com/codefactors/StandardWebhooks/compare/1.0.33...1.0.35)
