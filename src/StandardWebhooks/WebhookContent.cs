@@ -4,9 +4,11 @@
 //
 //   * The MIT License, see https://opensource.org/license/mit/
 
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace StandardWebhooks;
 
@@ -36,9 +38,22 @@ public class WebhookContent<T> : ByteArrayContent
     /// <param name="jsonOptions">The JSON serialization options to be used to serialize the content. Optional,
     /// defaults to <see cref="JsonSerializerDefaults.Web"/>  with WriteIndented set to false.</param>
     /// <returns>New instance of a <see cref="WebhookContent{T}"/>.</returns>
+    [RequiresDynamicCode("This code path does not support NativeAOT. Use the JsonSerializationContext overload for NativeAOT Scenarios.")]
+    [RequiresUnreferencedCode("This code path does not support NativeAOT. Use the JsonSerializationContext overload for NativeAOT Scenarios.")]
     public static WebhookContent<T> Create(T content, JsonSerializerOptions? jsonOptions = null)
     {
         var utf8bytes = JsonSerializer.SerializeToUtf8Bytes(content, jsonOptions ?? DefaultJsonSerializerOptions);
+
+        return new WebhookContent<T>(utf8bytes);
+    }
+
+    /// <summary>Creates a new instance of the <see cref="WebhookContent{T}"/> class.</summary>
+    /// <param name="content">The content to be used to initialize the <see cref="WebhookContent{T}"/>.</param>
+    /// <param name="context">The JsonSerializationContext used to serialize this payload.</param>
+    /// <returns>New instance of a <see cref="WebhookContent{T}"/>.</returns>
+    public static WebhookContent<T> Create(T content, JsonSerializerContext context)
+    {
+        var utf8bytes = JsonSerializer.SerializeToUtf8Bytes(content, typeof(T), context);
 
         return new WebhookContent<T>(utf8bytes);
     }

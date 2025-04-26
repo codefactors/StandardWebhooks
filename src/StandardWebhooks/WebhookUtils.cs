@@ -27,12 +27,12 @@ internal static class WebhookUtils
     /// <returns>true if the strings are identical; false otherwise.</returns>
     /// <exception cref="ArgumentNullException">Thrown if either of the input parameters are null.</exception>
     [MethodImpl(MethodImplOptions.NoOptimization)]
-    public static bool SecureCompare(string a, string b)
+    public static bool SecureCompare(ReadOnlySpan<char> a, ReadOnlySpan<char> b)
     {
-        if (a == null)
+        if (a.IsEmpty)
             throw new ArgumentNullException(nameof(a));
 
-        if (b == null)
+        if (b.IsEmpty)
             throw new ArgumentNullException(nameof(b));
 
         if (a.Length != b.Length)

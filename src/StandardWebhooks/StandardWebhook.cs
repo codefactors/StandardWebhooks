@@ -4,13 +4,18 @@
 //
 //   * The MIT License, see https://opensource.org/license/mit/
 
-// Portions Copyright (c) 2023 Svix (https://www.svix.com) used under MIT licence,
+// Portions Copyright (c) 2025 Svix (https://www.svix.com) used under MIT licence,
 // see https://github.com/standard-webhooks/standard-webhooks/blob/main/libraries/LICENSE.
 
-using StandardWebhooks.Diagnostics;
+using System.Buffers;
+using System.Buffers.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http;
+using StandardWebhooks.Diagnostics;
 
 namespace StandardWebhooks;
 
@@ -20,7 +25,11 @@ namespace StandardWebhooks;
 /// </summary>
 public sealed class StandardWebhook
 {
+    private const int SIGNATURE_LENGTH_BYTES = HMACSHA256.HashSizeInBytes;
+    private const int SIGNATURE_LENGTH_BASE64 = 48;
+    private const int SIGNATURE_LENGTH_STRING = 56;
     private const int TOLERANCE_IN_SECONDS = 60 * 5;
+    private const int MAX_STACKALLOC = 1024 * 256;
     private const string PREFIX = "whsec_";
 
     private static readonly UTF8Encoding SafeUTF8Encoding = new UTF8Encoding(false, true);
@@ -83,36 +92,53 @@ public sealed class StandardWebhook
     /// </exception>
     public void Verify(string payload, IHeaderDictionary headers)
     {
-        string msgId = headers[_idHeaderKey].ToString();
-        string msgSignature = headers[_signatureHeaderKey].ToString();
-        string msgTimestamp = headers[_timestampHeaderKey].ToString();
+        ReadOnlySpan<char> msgId = headers[_idHeaderKey].ToString();
+        ReadOnlySpan<char> msgSignature = headers[_signatureHeaderKey].ToString();
+        ReadOnlySpan<char> msgTimestamp = headers[_timestampHeaderKey].ToString();
 
-        if (string.IsNullOrEmpty(msgId) || string.IsNullOrEmpty(msgSignature) || string.IsNullOrEmpty(msgTimestamp))
+        if (msgId.IsEmpty || msgSignature.IsEmpty || msgTimestamp.IsEmpty)
             throw new WebhookVerificationException($"Missing required headers; {_idHeaderKey}, {_signatureHeaderKey} and {_timestampHeaderKey} must be supplied");
 
-        var timestamp = VerifyTimestamp(msgTimestamp);
+        VerifyTimestamp(msgTimestamp);
 
-        var expectedSignature = Sign(msgId, timestamp, payload)
-            .Split(',')[1];
+        Span<char> expectedSignature = stackalloc char[SIGNATURE_LENGTH_STRING];
+        CalculateSignature(
+            msgId,
+            msgTimestamp,
+            payload,
+            expectedSignature,
+            out var charsWritten);
+        expectedSignature = expectedSignature.Slice(0, charsWritten);
 
-        var passedSignatures = msgSignature.Split(' ');
-
-        foreach (string versionedSignature in passedSignatures)
+        var signaturePtr = msgSignature;
+        var spaceIndex = signaturePtr.IndexOf(' ');
+        do
         {
-            var parts = versionedSignature.Split(',');
+            var versionedSignature =
+                spaceIndex < 0 ? msgSignature : signaturePtr.Slice(0, spaceIndex);
 
-            if (parts.Length < 2)
-                throw new WebhookVerificationException("Invalid signature header; must be in the form 'version,signature'");
+            signaturePtr = signaturePtr.Slice(spaceIndex + 1);
+            spaceIndex = signaturePtr.IndexOf(' ');
 
-            var version = parts[0];
-            var passedSignature = parts[1];
+            var commaIndex = versionedSignature.IndexOf(',');
+            if (commaIndex < 0)
+            {
+                throw new WebhookVerificationException("Invalid Signature Headers");
+            }
 
-            if (version != "v1")
+            var version = versionedSignature.Slice(0, commaIndex);
+            if (!version.Equals("v1", StringComparison.InvariantCulture))
+            {
                 continue;
+            }
 
+            var passedSignature = versionedSignature.Slice(commaIndex + 1);
             if (WebhookUtils.SecureCompare(expectedSignature, passedSignature))
+            {
                 return;
+            }
         }
+        while (spaceIndex >= 0);
 
         throw new WebhookVerificationException("No matching signature found");
     }
@@ -125,20 +151,24 @@ public sealed class StandardWebhook
     /// <param name="payload">Webhook payload, as a string.</param>
     /// <returns>Standard Webhooks signature in the format 'version,signature'.</returns>
     /// <remarks>Currently only supports 'v1' signatures.</remarks>
-    public string Sign(string msgId, DateTimeOffset timestamp, string payload)
+    public string Sign(
+        ReadOnlySpan<char> msgId,
+        DateTimeOffset timestamp,
+        ReadOnlySpan<char> payload)
     {
-        var toSign = $"{msgId}.{timestamp.ToUnixTimeSeconds()}.{payload}";
-        var toSignBytes = SafeUTF8Encoding.GetBytes(toSign);
-
-        using (var hmac = new HMACSHA256(this._key))
-        {
-            var hash = hmac.ComputeHash(toSignBytes);
-
-            var signature = Convert.ToBase64String(hash);
-
-            return $"v1,{signature}";
-        }
+        Span<char> signature = stackalloc char[SIGNATURE_LENGTH_STRING];
+        signature[0] = 'v';
+        signature[1] = '1';
+        signature[2] = ',';
+        CalculateSignature(
+            msgId,
+            timestamp.ToUnixTimeSeconds().ToString(),
+            payload,
+            signature.Slice(3),
+            out var charsWritten);
+        return signature.Slice(0, charsWritten + 3).ToString();
     }
+
 
     /// <summary>
     /// Generates an <see cref="HttpContent"/> that contains the supplied payload, with the appropriate
@@ -152,6 +182,8 @@ public sealed class StandardWebhook
     /// the payload is serialized.</param>
     /// <returns>An <see cref="HttpContent"/> initialised with the JSON serialized payload and necessary
     /// headers set.</returns>
+    [RequiresUnreferencedCode("This code path does not support NativeAOT. Use the JsonSerializationContext overload for NativeAOT Scenarios.")]
+    [RequiresDynamicCode("This code path does not support NativeAOT. Use the JsonSerializationContext overload for NativeAOT Scenarios.")]
     public HttpContent MakeHttpContent<T>(T body, string msgId, DateTimeOffset timestamp, JsonSerializerOptions? jsonOptions = null)
     {
         var content = WebhookContent<T>.Create(body, jsonOptions);
@@ -165,7 +197,31 @@ public sealed class StandardWebhook
         return content;
     }
 
-    private static DateTimeOffset VerifyTimestamp(string timestampHeader)
+    /// <summary>
+    /// Generates an <see cref="HttpContent"/> that contains the supplied payload, with the appropriate
+    /// Standard Webhooks headers added, including the signature for the payload.
+    /// </summary>
+    /// <typeparam name="T">Type of payload.</typeparam>
+    /// <param name="body">Content for the webhook payload.</param>
+    /// <param name="msgId">Message identifier.</param>
+    /// <param name="timestamp">Sending timestamp.</param>
+    /// <param name="context">The JsonSerializationContext used to serialize this payload.</param>
+    /// <returns>An <see cref="HttpContent"/> initialised with the JSON serialized payload and necessary
+    /// headers set.</returns>
+    public HttpContent MakeHttpContent<T>(T body, string msgId, DateTimeOffset timestamp, JsonSerializerContext context)
+    {
+        var content = WebhookContent<T>.Create(body, context);
+
+        var signature = Sign(msgId, timestamp, content.ToString());
+
+        content.Headers.Add(_idHeaderKey, msgId);
+        content.Headers.Add(_timestampHeaderKey, timestamp.ToUnixTimeSeconds().ToString());
+        content.Headers.Add(_signatureHeaderKey, signature);
+
+        return content;
+    }
+
+    private static void VerifyTimestamp(ReadOnlySpan<char> timestampHeader)
     {
         DateTimeOffset timestamp;
 
@@ -187,7 +243,66 @@ public sealed class StandardWebhook
 
         if (timestamp > now.AddSeconds(TOLERANCE_IN_SECONDS))
             throw new WebhookVerificationException("Message timestamp too new");
+    }
 
-        return timestamp;
+    private void CalculateSignature(
+            ReadOnlySpan<char> msgId,
+            ReadOnlySpan<char> timestamp,
+            ReadOnlySpan<char> payload,
+            Span<char> signature,
+            out int charsWritten)
+        {
+            // Estimate buffer size and use stackalloc for smaller allocations
+            int msgIdLength = SafeUTF8Encoding.GetByteCount(msgId);
+            int payloadLength = SafeUTF8Encoding.GetByteCount(payload);
+            int timestampLength = SafeUTF8Encoding.GetByteCount(timestamp);
+            int totalLength = msgIdLength + 1 + timestampLength + 1 + payloadLength;
+
+            Span<byte> toSignBytes =
+                totalLength <= MAX_STACKALLOC
+                    ? stackalloc byte[totalLength]
+                    : new byte[totalLength];
+
+            SafeUTF8Encoding.GetBytes(msgId, toSignBytes.Slice(0, msgIdLength));
+            toSignBytes[msgIdLength] = (byte)'.';
+            SafeUTF8Encoding.GetBytes(
+                timestamp,
+                toSignBytes.Slice(msgIdLength + 1, timestampLength));
+            toSignBytes[msgIdLength + 1 + timestampLength] = (byte)'.';
+            SafeUTF8Encoding.GetBytes(
+                payload,
+                toSignBytes.Slice(msgIdLength + 1 + timestampLength + 1));
+
+            Span<byte> signatureBin = stackalloc byte[SIGNATURE_LENGTH_BYTES];
+            CalculateSignature(toSignBytes, signatureBin);
+
+            Span<byte> signatureB64 = stackalloc byte[SIGNATURE_LENGTH_BASE64];
+            var result = Base64.EncodeToUtf8(
+                signatureBin,
+                signatureB64,
+                out _,
+                out var bytesWritten);
+            if (result != OperationStatus.Done)
+                throw new WebhookVerificationException("Failed to encode signature to base64");
+
+            if (
+                !SafeUTF8Encoding.TryGetChars(
+                    signatureB64.Slice(0, bytesWritten),
+                    signature,
+                    out charsWritten)
+            )
+                throw new WebhookVerificationException("Failed to convert signature to utf8");
+        }
+
+    private void CalculateSignature(ReadOnlySpan<byte> input, Span<byte> output)
+    {
+        try
+        {
+            HMACSHA256.HashData(_key, input, output);
+        }
+        catch (Exception)
+        {
+            throw new WebhookVerificationException("Output buffer too small");
+        }
     }
 }

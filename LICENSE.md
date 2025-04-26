@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Portions Copyright (c) 2023 Svix (https://www.svix.com) used under MIT licence,
+Portions Copyright (c) 2025 Svix (https://www.svix.com) used under MIT licence,
 see https://github.com/standard-webhooks/standard-webhooks/blob/main/libraries/LICENSE.
 
 Portions Copyright (c) Stripe Inc used under Apache License v2.0, see
