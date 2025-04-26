@@ -6,7 +6,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -18,10 +17,6 @@ namespace StandardWebhooks;
 /// <typeparam name="T">The type of the content.</typeparam>
 public class WebhookContent<T> : ByteArrayContent
 {
-    private static readonly Encoding Utf8Encoding = new UTF8Encoding(false, true);
-    private static readonly JsonSerializerOptions DefaultJsonSerializerOptions =
-         new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = false };
-
     // Maintain copy of the content so we can return it as a string.
     private readonly byte[] _content;
 
@@ -30,7 +25,7 @@ public class WebhookContent<T> : ByteArrayContent
     {
         _content = content;
 
-        Headers.ContentType = new MediaTypeHeaderValue("application/json") { CharSet = Utf8Encoding.WebName };
+        Headers.ContentType = new MediaTypeHeaderValue("application/json") { CharSet = WebhookContentDefaults.Utf8Encoding.WebName };
     }
 
     /// <summary>Creates a new instance of the <see cref="WebhookContent{T}"/> class.</summary>
@@ -42,7 +37,7 @@ public class WebhookContent<T> : ByteArrayContent
     [RequiresUnreferencedCode("This code path does not support NativeAOT. Use the JsonSerializationContext overload for NativeAOT Scenarios.")]
     public static WebhookContent<T> Create(T content, JsonSerializerOptions? jsonOptions = null)
     {
-        var utf8bytes = JsonSerializer.SerializeToUtf8Bytes(content, jsonOptions ?? DefaultJsonSerializerOptions);
+        var utf8bytes = JsonSerializer.SerializeToUtf8Bytes(content, jsonOptions ?? WebhookContentDefaults.JsonSerializerOptions);
 
         return new WebhookContent<T>(utf8bytes);
     }
@@ -62,5 +57,5 @@ public class WebhookContent<T> : ByteArrayContent
     /// Gets the content as a string.
     /// </summary>
     /// <returns>String representation of the content.</returns>
-    public override string ToString() => Utf8Encoding.GetString(_content);
+    public override string ToString() => WebhookContentDefaults.Utf8Encoding.GetString(_content);
 }
