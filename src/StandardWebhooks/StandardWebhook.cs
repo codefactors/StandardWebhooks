@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2024, Codefactors Ltd.
+// Copyright (c) 2024, Codefactors Ltd.
 //
 // Codefactors Ltd licenses this file to you under the following license(s):
 //
 //   * The MIT License, see https://opensource.org/license/mit/
 
 // Portions Copyright (c) 2025 Svix (https://www.svix.com) used under MIT licence,
-// see https://github.com/standard-webhooks/standard-webhooks/blob/main/libraries/LICENSE.
+// see https://github.com/svix/svix-webhooks/blob/main/LICENSE.
 
 using System.Buffers;
 using System.Buffers.Text;
@@ -182,8 +182,6 @@ public sealed class StandardWebhook
     /// the payload is serialized.</param>
     /// <returns>An <see cref="HttpContent"/> initialised with the JSON serialized payload and necessary
     /// headers set.</returns>
-    [RequiresUnreferencedCode("This code path does not support NativeAOT. Use the JsonSerializationContext overload for NativeAOT Scenarios.")]
-    [RequiresDynamicCode("This code path does not support NativeAOT. Use the JsonSerializationContext overload for NativeAOT Scenarios.")]
     public HttpContent MakeHttpContent<T>(T body, string msgId, DateTimeOffset timestamp, JsonSerializerOptions? jsonOptions = null)
     {
         var content = WebhookContent<T>.Create(body, jsonOptions);

@@ -33,11 +33,13 @@ public class WebhookContent<T> : ByteArrayContent
     /// <param name="jsonOptions">The JSON serialization options to be used to serialize the content. Optional,
     /// defaults to <see cref="JsonSerializerDefaults.Web"/>  with WriteIndented set to false.</param>
     /// <returns>New instance of a <see cref="WebhookContent{T}"/>.</returns>
-    [RequiresDynamicCode("This code path does not support NativeAOT. Use the JsonSerializationContext overload for NativeAOT Scenarios.")]
-    [RequiresUnreferencedCode("This code path does not support NativeAOT. Use the JsonSerializationContext overload for NativeAOT Scenarios.")]
     public static WebhookContent<T> Create(T content, JsonSerializerOptions? jsonOptions = null)
     {
+#pragma warning disable IL3050 This overload can still be used in NativeAOT as long as the serializer context has been provided to the options object.
+#pragma warning disable IL2026
         var utf8bytes = JsonSerializer.SerializeToUtf8Bytes(content, jsonOptions ?? WebhookContentDefaults.JsonSerializerOptions);
+#pragma warning restore IL2026
+#pragma warning restore IL3050
 
         return new WebhookContent<T>(utf8bytes);
     }

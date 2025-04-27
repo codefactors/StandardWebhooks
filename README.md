@@ -79,7 +79,7 @@ leveraging the retry capabilites of the [Polly](https://github.com/App-vNext/Pol
 This project leverages the work of the **Standard Webhooks** project, published on Github in the [standard-webhooks](https://github.com/standard-webhooks/standard-webhooks) repository.
 Specifically it builds upon the [C# reference implementation](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries/csharp).
 
-Signature verification is based on the [svix-webhooks implementation](https://github.com/svix/svix-webhooks).
+Signature verification is based on the [svix-webhooks implementation](https://github.com/svix/svix-webhooks), used under MIT.
 
 ## License
 This project is licensed under the MIT License.
