@@ -1,5 +1,16 @@
 # Releases
 
+# 1.1.1
+
+Full changelog: [1.0.36 -> 1.1.1](https://github.com/codefactors/StandardWebhooks/compare/1.0.36...1.1.1)
+
+## What's Changed
+
+### Update
+- Feat: Migrated to SVIX implementation of webhook verification which is faster and allocates
+  less - many thanks @Hawky for the contribution
+- Chore: Updated dependency (xunit.runner.visualstudio)
+
 # 1.0.36
 
 Full changelog: [1.0.35 -> 1.0.36](https://github.com/codefactors/StandardWebhooks/compare/1.0.35...1.0.36)
