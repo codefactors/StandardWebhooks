@@ -169,7 +169,6 @@ public sealed class StandardWebhook
         return signature.Slice(0, charsWritten + 3).ToString();
     }
 
-
     /// <summary>
     /// Generates an <see cref="HttpContent"/> that contains the supplied payload, with the appropriate
     /// Standard Webhooks headers added, including the signature for the payload.

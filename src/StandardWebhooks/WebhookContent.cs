@@ -35,7 +35,7 @@ public class WebhookContent<T> : ByteArrayContent
     /// <returns>New instance of a <see cref="WebhookContent{T}"/>.</returns>
     public static WebhookContent<T> Create(T content, JsonSerializerOptions? jsonOptions = null)
     {
-#pragma warning disable IL3050 This overload can still be used in NativeAOT as long as the serializer context has been provided to the options object.
+#pragma warning disable IL3050 // This overload can still be used in NativeAOT as long as the serializer context has been provided to the options object.
 #pragma warning disable IL2026
         var utf8bytes = JsonSerializer.SerializeToUtf8Bytes(content, jsonOptions ?? WebhookContentDefaults.JsonSerializerOptions);
 #pragma warning restore IL2026

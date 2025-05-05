@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace StandardWebhooks
 {
     /// <summary>
-    /// Internal defaults for <see cref="WebhookContent{T}"/>
+    /// Internal defaults for <see cref="WebhookContent{T}"/>.
     /// </summary>
     internal static class WebhookContentDefaults
     {

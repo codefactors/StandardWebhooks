@@ -1,24 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
-	
-	<PropertyGroup>
-		<Authors>Codefactors Ltd</Authors>
-		<Copyright>Copyright (c) 2024, Codefactors Ltd</Copyright>
-		<Company>Codefactors Ltd</Company>
-		<Description>An implementation of Standard Webhooks for use in .NET Core and ASP.NET Core projects</Description>
-		<PackageProjectUrl>https://github.com/codefactors/StandardWebhooks</PackageProjectUrl>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-		<RepositoryUrl>https://github.com/codefactors/StandardWebhooks</RepositoryUrl>
-	</PropertyGroup>
-	
-	<ItemGroup>
-		<PackageReference Include="MinVer" Version="5.0.0" PrivateAssets="All"/>
-	</ItemGroup>
 
-	<ItemGroup>
-		<None Include="$(SolutionDir)LICENSE.md" Pack="true" PackagePath="" />
-		<None Include="$(SolutionDir)src\StandardWebhooks\README.md" Pack="true" PackagePath="" />
-	</ItemGroup>
+  <PropertyGroup>
+    <Authors>Codefactors Ltd</Authors>
+    <Copyright>Copyright (c) 2024, Codefactors Ltd</Copyright>
+    <Company>Codefactors Ltd</Company>
+    <Description>An implementation of Standard Webhooks for use in .NET Core and ASP.NET Core projects</Description>
+    <PackageProjectUrl>https://github.com/codefactors/StandardWebhooks</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/codefactors/StandardWebhooks</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="6.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(SolutionDir)LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="$(SolutionDir)src\StandardWebhooks\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 
 </Project>

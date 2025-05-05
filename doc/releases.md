@@ -1,5 +1,14 @@
 # Releases
 
+# 1.1.2
+
+Full changelog: [1.1.1 -> 1.1.2](https://github.com/codefactors/StandardWebhooks/compare/1.1.1...1.1.2)
+
+## What's Changed
+
+### Update
+- Misc: removed redundant duplicate reference
+
 # 1.1.1
 
 Full changelog: [1.0.36 -> 1.1.1](https://github.com/codefactors/StandardWebhooks/compare/1.0.36...1.1.1)
