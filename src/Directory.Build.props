@@ -8,7 +8,7 @@
     <Description>An implementation of Standard Webhooks for use in .NET Core and ASP.NET Core projects</Description>
     <PackageProjectUrl>https://github.com/codefactors/StandardWebhooks</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/codefactors/StandardWebhooks</RepositoryUrl>
   </PropertyGroup>
 
